@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>Coloring w/ JavaScript - v1.0</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <link href="./resources/css/index.css" type="text/css" rel="stylesheet">
+    <link rel="icon" href="./resources/images/brush.png">
+</head>
+<body>
+    <header>
+        <div id="headtop">
+            <h1>Welcome to Coloring with JavaScript!</h1>
+            
+        </div>
+    </header>
+
+    <div id="trifold">
+        <table class="selecttable">
+            <tr><td class="black selected"><div class="sq"></div></td></tr>
+            <tr><td class="red"><div class="sq"></div></td></tr>
+            <tr><td class="orange"><div class="sq"></div></td></tr>
+            <tr><td class="yellow"><div class="sq"></div></td></tr>
+            <tr><td class="green"><div class="sq"></div></td></tr>
+            <tr><td class="blue"><div class="sq"></div></td></tr>
+            <tr><td class="cyan"><div class="sq"></div></td></tr>
+            <tr><td class="magenta"><div class="sq"></div></td></tr>
+            <tr><td class="purple"><div class="sq"></div></td></tr>
+            <tr><td class="gray"><div class="sq"></div></td></tr>
+        </table>
+
+        <table class="maintable">
+            <script>
+                for (var r = 0;  r < 20; r++) {
+                    document.write("<tr>");
+                    for (var c = 0;  c < 20; c++) {
+                        document.write("<td id='" + r + "," + c + "'><div class='sq'></div></td>")
+                    }
+                    document.write("</tr>");
+                }
+            </script>
+        </table>
+
+        <table class="cursortable">
+            <tr><td id="dot" class="dot currCurs"><div class="sq"><img src="./resources/images/dot.png" alt="Dot (1 square)."></div></td></tr>
+            <tr><td id="side"><div class="sq"><img src="./resources/images/side.png" alt="Side-to-Side (3 horizontal squares)."></div></td></tr>
+            <tr><td id="up"><div class="sq"><img src="./resources/images/up.png" alt="Up-and-Down (3 vertical squares)."></div></td></tr>
+            <tr><td id="diagonalright"><div class="sq"><img src="./resources/images/diagonalright.png" alt="Diagonal right (3 diagonal squares up from left to right)."></div></td></tr>
+            <tr><td id="diagonalleft"><div class="sq"><img src="./resources/images/diagonalleft.png" alt="Diagonal left (3 diagonal squares down from left to right)."></div></td></tr>
+            <tr><td id="plus"><div class="sq"><img src="./resources/images/plus.png" alt="Plus Sign (3 vertical squares intersected by 3 horizontal)."></div></td></tr>
+            <tr><td id="x"><div class="sq"><img src="./resources/images/x.png" alt="Letter x (3 diagonal squares bottom left to top right, and 3 from top left to bottom right)."></div></td></tr>
+            <tr><td id="donut"><div class="sq"><img src="./resources/images/donut.png" alt="Donut (3 x 3 square with a whole in the middle square)."></div></td></tr>
+            <tr><td id="doubleH"><div class="sq"><img src="./resources/images/doubleH.png" alt="Double Side-to-Side (3 x 2 rectangle)."></div></td></tr>
+            <tr><td id="doubleV"><div class="sq"><img src="./resources/images/doubleV.png" alt="Double Up-and-Down (2 x 3 rectangle)."></div></td></tr>
+        </table>
+    </div>
+    
+
+    <script>
+
+        $(document).ready(function () {
+            $('table.selecttable td').click(function () {
+                $('table.selecttable td').removeClass('selected');
+                $(this).addClass('selected');
+            });
+        });
+
+        $(document).ready(function () {
+            $('table.cursortable td').click(function () {
+                $('table.cursortable td').removeClass('currCurs');
+                $(this).addClass('currCurs');
+            });
+        });
+
+        $(document).ready(function () {
+            $('table.maintable td').click(function () {
+                var arr = document.getElementsByClassName('selected');
+                var selected = arr[0];
+                clicking(this, selected);
+                var id = $(this).attr('id');
+                var idArr = id.split(',');
+                var x = parseInt(idArr[0]);
+                var y = parseInt(idArr[1]);
+
+                //find cursor
+                var curs = $(document.getElementsByClassName('currCurs')).attr('id');
+
+                if (curs == 'plus'){
+                    //orthogonal
+                    var up = document.getElementById((x-1) + ',' + y);
+                    clicking(up, selected);
+                    var down = document.getElementById((x+1) + ',' + y);
+                    clicking(down, selected);
+                    var left = document.getElementById(x + ',' + (y-1));
+                    clicking(left, selected);
+                    var right = document.getElementById(x + ',' + (y+1));
+                    clicking(right, selected);
+                }
+
+                if (curs == 'up') {
+                    var up = document.getElementById((x-1) + ',' + y);
+                    clicking(up, selected);
+                    var down = document.getElementById((x+1) + ',' + y);
+                    clicking(down, selected);
+                }
+
+                if (curs == 'side') {
+                    var left = document.getElementById(x + ',' + (y-1));
+                    clicking(left, selected);
+                    var right = document.getElementById(x + ',' + (y+1));
+                    clicking(right, selected);
+                }
+
+                if (curs == 'diagonalright' || curs == 'x') {
+                    var downleft = document.getElementById((x+1) + ',' + (y-1));
+                    clicking(downleft, selected);
+                    var upright = document.getElementById((x-1) + ',' + (y+1));
+                    clicking(upright, selected);
+                }
+
+                if (curs == 'diagonalleft' || curs == 'x') {
+                    var upleft = document.getElementById((x-1) + ',' + (y-1));
+                    clicking(upleft, selected);
+                    var downright = document.getElementById((x+1) + ',' + (y+1));
+                    clicking(downright, selected);
+                }
+
+                if (curs == 'doubleH') {
+                    var left = document.getElementById(x + ',' + (y-1));
+                    clicking(left, selected);
+                    var right = document.getElementById(x + ',' + (y+1));
+                    clicking(right, selected);
+                    var upleft = document.getElementById((x-1) + ',' + (y-1));
+                    clicking(upleft, selected);
+                    var upright = document.getElementById((x-1) + ',' + (y+1));
+                    clicking(upright, selected);
+                    var up = document.getElementById((x-1) + ',' + y);
+                    clicking(up, selected);
+                }
+                
+                if (curs == 'doubleV') {
+                    var left = document.getElementById(x + ',' + (y-1));
+                    clicking(left, selected);
+                    var up = document.getElementById((x-1) + ',' + y);
+                    clicking(up, selected);
+                    var down = document.getElementById((x+1) + ',' + y);
+                    clicking(down, selected);
+                    var upleft = document.getElementById((x-1) + ',' + (y-1));
+                    clicking(upleft, selected);
+                    var downleft = document.getElementById((x+1) + ',' + (y-1));
+                    clicking(downleft, selected);
+                }
+
+                if (curs == 'donut') {
+                    clicking(this, selected);
+                    var left = document.getElementById(x + ',' + (y-1));
+                    clicking(left, selected);
+                    var up = document.getElementById((x-1) + ',' + y);
+                    clicking(up, selected);
+                    var down = document.getElementById((x+1) + ',' + y);
+                    clicking(down, selected);
+                    var upleft = document.getElementById((x-1) + ',' + (y-1));
+                    clicking(upleft, selected);
+                    var downleft = document.getElementById((x+1) + ',' + (y-1));
+                    clicking(downleft, selected);
+                    var downright = document.getElementById((x+1) + ',' + (y+1));
+                    clicking(downright, selected);
+                    var upright = document.getElementById((x-1) + ',' + (y+1));
+                    clicking(upright, selected);
+                    var right = document.getElementById(x + ',' + (y+1));
+                    clicking(right, selected);
+                }
+            });
+        });
+
+        function clicking(cell, selected) {
+            if ($(cell).hasClass(selected.className)){ //toggle between white if same color
+                    cell.className = '';
+            }
+
+            else {
+                cell.className = '';
+                $(cell).addClass('clicked ' + selected.className);
+            }
+        }
+
+
+        
+
+    </script>
+
+    
+</body>
+</html>
